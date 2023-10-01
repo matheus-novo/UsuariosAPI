@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using UsuariosAPI.Authorization;
 using UsuariosAPI.Data;
 using UsuariosAPI.Models;
 using UsuariosAPI.Services;
@@ -28,6 +30,8 @@ builder.Services.AddDbContext<UsuarioDbContext>(
 //Utilizando o AutoMapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+
+//Implementando o JasonWebToken
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<TokenService>();
 
@@ -35,6 +39,11 @@ builder.Services.AddIdentity<Usuario, IdentityRole>()
     .AddEntityFrameworkStores<UsuarioDbContext>()
     .AddDefaultTokenProviders();
 
+//Controle de Idade Minima
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("IdadeMinima", policy => policy.AddRequirements(new IdadeMinima(18)));
+});
 
 var app = builder.Build();
 
